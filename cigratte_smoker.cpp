@@ -1,7 +1,6 @@
 #include <iostream>
 #include <thread>
 #include <mutex>
-#include<bits/stdc++.h>
 #include <random>
 
 using namespace std;
