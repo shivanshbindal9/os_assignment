@@ -1,13 +1,48 @@
 #include <iostream>
 #include <thread>
-#include <mutex>
 
 using namespace std;
 
 int BUFFER_SIZE  =  100;
 int item_no = 0;
 int max_run = 20;
-mutex m;
+
+class CustomMux
+{ 
+    std::atomic<int> m; 
+public:
+    CustomMux(): m(0) {} 
+    void lock() 
+    { 
+      while ((m++) > 1) m--;
+    } 
+    void unlock() 
+    { 
+        m--;
+    } 
+};
+
+class semaphore {
+private:
+  CustomMux m;
+  atomic<int> s;
+public:
+  semaphore(int init = 1): s(init) {}
+  void Wait() {
+    while (true) {
+      while (s <= 0);
+      m.lock();
+      if (s <= 0) { m.unlock(); continue; }
+      s--;
+      m.unlock();
+      break;
+    }
+  }
+  void Signal() { s++; }
+};
+
+
+CustomMux m;
 int turn = 0;
 void producer(){
 	while(max_run>0){
